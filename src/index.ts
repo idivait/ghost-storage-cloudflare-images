@@ -26,6 +26,8 @@ class CloudflareStorage extends StorageBase {
     this.apiToken = apiToken
     this.accountHash = accountHash
 
+    console.log(`Cloudflare image storage initialized.`)
+
     if (!this.accountId) throw new Error('No Cloudflare Account ID provided')
     if (!this.apiToken) throw new Error('No Cloudflare API Token provided')
     if (!this.accountHash) throw new Error('No Cloudflare account hash provided')
@@ -63,6 +65,7 @@ class CloudflareStorage extends StorageBase {
             metadata: { ...image }
         })
         if (!upload.success || !upload.result) throw new Error(upload.errors.map(err=>err.message).join())
+        console.log(`Upload result`, upload)
         return this.getCloudflareImageURL(upload.result.filename)
     } catch(err) {
         throw new Error(`Error during file save operation: ${err.message}`);

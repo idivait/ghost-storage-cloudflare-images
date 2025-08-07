@@ -12,10 +12,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@tryghost/logging": "^2.4.23",
     "cloudflare-images-client": "^1.1.5",
     "ghost-storage-base": "^1.1.1"
   },
-    "devDependencies": {
+  "devDependencies": {
     "@types/express": "^4.17.17",
     "@types/ghost-storage-base": "^0.0.1",
     "esbuild": "^0.20.2",

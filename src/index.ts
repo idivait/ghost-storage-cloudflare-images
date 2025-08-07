@@ -1,5 +1,6 @@
 import { CloudflareImagesClient } from 'cloudflare-images-client'
 import StorageBase, { type ReadOptions, type Image } from 'ghost-storage-base'
+import logging from '@tryghost/logging';
 
 type Config = {
   accountId?: string
@@ -26,7 +27,7 @@ class CloudflareStorage extends StorageBase {
     this.apiToken = apiToken
     this.accountHash = accountHash
 
-    console.log(`Cloudflare image storage initialized.`)
+    logging.info(`Cloudflare image storage initialized.`)
 
     if (!this.accountId) throw new Error('No Cloudflare Account ID provided')
     if (!this.apiToken) throw new Error('No Cloudflare API Token provided')
@@ -56,6 +57,7 @@ class CloudflareStorage extends StorageBase {
   }
 
   async save(image: Image, targetDir?: string) {
+    logging.info("Atempting to save...")
     if(!this.isValidImage(image)) throw new Error('Invalid image object. Image must have name and path.')
 
     try {
@@ -64,8 +66,8 @@ class CloudflareStorage extends StorageBase {
             filePath: image.path,
             metadata: { ...image }
         })
+        logging.info(`Upload result`, JSON.stringify(upload))
         if (!upload.success || !upload.result) throw new Error(upload.errors.map(err=>err.message).join())
-        console.log(`Upload result`, upload)
         return this.getCloudflareImageURL(upload.result.filename)
     } catch(err) {
         throw new Error(`Error during file save operation: ${err.message}`);

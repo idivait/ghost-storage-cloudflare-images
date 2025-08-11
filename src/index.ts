@@ -43,10 +43,12 @@ class CloudflareStorage extends StorageBase {
   }
 
   cloudflare() {
-    return new CloudflareImagesClient({
+    const config = {
         accountId: this.accountId || '',
         apiToken: this.apiToken || '',
-    })
+    }
+    console.warn(config)
+    return new CloudflareImagesClient(config)
   }
 
   isValidImage(image) {
@@ -66,11 +68,12 @@ class CloudflareStorage extends StorageBase {
             filePath: image.path,
             metadata: { ...image }
         })
+        console.warn(`upload`, upload)
         logging.info(`Upload result`, JSON.stringify(upload))
         if (!upload.success || !upload.result) throw new Error(upload.errors.map(err=>err.message).join())
         return this.getCloudflareImageURL(upload.result.filename)
     } catch(err) {
-        throw new Error(`Error during file save operation: ${err.message}`);
+        throw new Error(`Error during file save operation: ${err.message} `);
     }
     
   }

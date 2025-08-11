@@ -42,13 +42,12 @@ class CloudflareStorage extends StorageBase {
     return false;
   }
 
-  cloudflare() {
+  cloudflareConfig() {
     const config = {
         accountId: this.accountId || '',
         apiToken: this.apiToken || '',
     }
-    console.warn(config)
-    return new CloudflareImagesClient(config)
+    return config
   }
 
   isValidImage(image) {
@@ -63,7 +62,11 @@ class CloudflareStorage extends StorageBase {
     if(!this.isValidImage(image)) throw new Error('Invalid image object. Image must have name and path.')
 
     try {
-        const upload = await this.cloudflare().uploadImageFromFile({
+        const config = this.cloudflareConfig()
+        const client = new CloudflareImagesClient(config)
+        console.warn(`config`, config)
+        console.warn(`client`, client)
+        const upload = await client.uploadImageFromFile({
             fileName: image.name,
             filePath: image.path,
             metadata: { ...image }

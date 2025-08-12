@@ -9,10 +9,15 @@ Since Ghost 6.0, the recommended (though preview) way to install Ghost is throug
    2. `npm install --omit=dev`
    3. `npm run build`
 2. Modify the env file
-   1. `cp .env.storage.example .env.storage`
-   2. Change the values as indicated in the env file. I've included links to find the values in the comments of the file.
-3. Move env file and example override file to root of ghost install
-   1. `mv .env.storage /opt/ghost/.env.storage`
-   2. `mv compose.example.override.yml /opt/ghost/compose.override.yml`
+   1. `cp .env.storage.example /opt/ghost/.env.storage`
+   2. `nano /opt/ghost/.env.storage`
+   3. Change the values as indicated in the env file. I've included links to find the values in the comments of the file.
+   4. Write out (^O), enter, and exit (^X)
+3. Move example override file to root of ghost install
+   1. `cp compose.example.override.yml /opt/ghost/compose.override.yml && cd /opt/ghost`
 4. Force recreate containers
    1. `docker compose down && docker compose up -d --force-recreate`
+
+## Method 2: Ghost CLI Install
+
+Following an install that used the guide here: [Officiall Ghost Install Guide](https://docs.ghost.org/install/ubuntu)

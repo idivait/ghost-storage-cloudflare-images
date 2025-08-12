@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@tryghost/logging": "^2.4.23",
-    "cloudflare-images-client": "^1.1.5",
+    "cloudflare": "^4.5.0",
     "ghost-storage-base": "^1.1.1"
   },
   "devDependencies": {

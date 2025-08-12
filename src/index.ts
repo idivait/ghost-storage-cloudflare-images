@@ -8,6 +8,18 @@ type Config = {
   accountHash?: string
 }
 
+interface CloudflareImage extends Image {
+  originalname: string,
+  encoding: string,
+  fieldname: string,
+  filename: string,
+  mimetype: string,
+  destination: string,
+  size: number,
+  type: string,
+  ext: string
+}
+
 class CloudflareStorage extends StorageBase {
   accountId?: string
   apiToken?: string
@@ -22,7 +34,6 @@ class CloudflareStorage extends StorageBase {
       accountHash,
     } = config
 
-    // Compatible with the cloudflare image client's default environment variables
     this.accountId = accountId
     this.apiToken = apiToken
     this.accountHash = accountHash
@@ -32,14 +43,26 @@ class CloudflareStorage extends StorageBase {
     if (!this.accountHash) throw new Error('No Cloudflare account hash provided')
   }
 
+  // This never gets called for some reason
   async delete(fileName: string, targetDir?: string) {
     console.warn(`filename`, fileName)
-    return true;
+    try {
+      await this.cloudflare().images.v1.delete(fileName, { account_id: this.accountId || '' })
+      return true
+    } catch(err){
+      console.warn(err)
+      return false
+    }
   }
 
+  // No idea why or when this is called in the application, but I'm using it in the code regardless.
   async exists(fileName: string, targetDir?: string) {
-    console.warn(`filename`, fileName)
-    return false;
+    try {
+      await this.cloudflare().images.v1.get(fileName, { account_id: this.accountId || ""})
+      return true
+    } catch(err) {
+      return false
+    }
   }
 
   cloudflare() {
@@ -69,36 +92,28 @@ class CloudflareStorage extends StorageBase {
       console.log(apiError.status) // 400
       console.log(apiError.name) // BadRequestError
       console.log(apiError.headers) // {server: 'nginx', ...}
+
+      throw error
     } else {
       throw error
     }
   }
 
-  async save(image: Image, targetDir?: string) {
-    console.warn(`image`, image)
+  async save(image: CloudflareImage, targetDir?: string) {
+    const fileName = this.getUniqueFileName(image, '')
     if(!this.isValidImage(image)) throw new Error('Invalid image object. Image must have name and path.')
+    if(await this.exists(fileName)) return this.getCloudflareImageURL(fileName)
 
-    try {
-        // const upload = await client.uploadImageFromFile({
-        //     fileName: image.name,
-        //     filePath: image.path,
-        //     metadata: { ...image }
-        // })
-
-        const upload = await this.cloudflare().images.v1.create({
-          account_id: this.accountId || '',
-          id: image.name,
-          file: createReadStream(image.path),
-          metadata: {...image},
-        }).catch(this.handleApiErrors)
-
-        if(!upload?.id) throw new Error(`No image id found. Image: ${image && JSON.stringify(image)}`)
-          
-        return this.getCloudflareImageURL(upload.id)
-    } catch(err) {
-        throw new Error(`Error during file save operation: ${err.message} `);
+    const config: CloudflareImagesClient.Images.V1.V1CreateParams = {
+      account_id: this.accountId || '',
+      id: fileName,
+      file: createReadStream(image.path),
+      metadata: JSON.stringify(image)
     }
-    
+
+    const upload = await this.cloudflare().images.v1.create(config).catch(this.handleApiErrors)
+    if(!upload?.id) throw new Error(`No image id found. Image: ${image && JSON.stringify(image)}`)
+    return this.getCloudflareImageURL(upload.id)
   }
 
   serve() {
@@ -107,6 +122,7 @@ class CloudflareStorage extends StorageBase {
     };
   }
 
+  // This is also never used. I don't know the point of these.
   async read(options: ReadOptions = { path: '' }) {
     throw new Error(`${options.path} not readable`);
     return Buffer.from('');

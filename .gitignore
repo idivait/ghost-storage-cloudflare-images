@@ -1,2 +1,5 @@
 node_modules
 index.js
+cloudflare-images/index.js
+.env
+.env.storage

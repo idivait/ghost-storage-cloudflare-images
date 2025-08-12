@@ -1,0 +1,7 @@
+services:
+  ghost:
+    user: node
+    env_file:
+      - ./.env.storage
+    volumes:
+      - ./ghost-storage-cloudflare-images:/var/lib/ghost/versions/6.0.0/core/server/adapters/storage/cloudflare-images

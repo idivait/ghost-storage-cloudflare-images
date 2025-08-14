@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "npm run dev:esbuild & npm run logs",
     "dev:esbuild": "esbuild ./src/index.ts --watch --bundle --outfile=index.js --platform=node --format=cjs --target=node16 --packages=external --footer:js='module.exports = module.exports.default;'",
     "build": "esbuild ./src/index.ts --bundle --outfile=index.js --platform=node --format=cjs --target=node16 --packages=external --footer:js='module.exports = module.exports.default;'",
     "prepublishOnly": "npm run build",
@@ -17,8 +18,8 @@
   "dependencies": {
     "@tryghost/logging": "^2.4.23",
     "cloudflare": "^4.5.0",
-    "ghost-storage-base": "^1.1.1",
-    "esbuild": "^0.20.2"
+    "esbuild": "^0.25.9",
+    "ghost-storage-base": "^1.1.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.17",

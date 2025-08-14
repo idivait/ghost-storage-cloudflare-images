@@ -7,7 +7,7 @@ services:
     depends_on:
       - ghost-db
     env_file:
-      - ./.env
+      - ./.env.development
     environment:
       database__client: mysql
       database__connection__host: ghost-db
@@ -31,6 +31,12 @@ services:
       MYSQL_RANDOM_ROOT_PASSWORD: '1'
     volumes:
       - ghost-db:/var/lib/mysql
+
+  maildev:
+    image: maildev/maildev
+    ports:
+      - "1080:1080"
+      - "1025:1025"
 
 volumes:
   ghost-db:
